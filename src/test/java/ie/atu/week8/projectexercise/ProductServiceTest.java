@@ -11,6 +11,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,23 @@ class ProductServiceTest {
         IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, ()-> productService.saveProduct(product));
         assertEquals(1350, iae.getMessage());
     }
+
+      @Test
+    void testGetProductById() {
+        Product product = new Product(1L, "Product 1", "Description", 100.0);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        Product result = productService.getProductById(1L).orElse(null);
+        assertNotNull(result);
+        assertEquals("Product 1", result.getName());
+    }
+
+    @Test
+    void testValidateProductForEmptyName() {
+        Product product = new Product(1L, "", "hi", 890);
+        IllegalArgumentException iae = assertThrows(IllegalArgumentException.class, () -> productService.saveProduct(product));
+        assertEquals("Product name cannot be empty", iae.getMessage());
+    }
+
 }
 
 
